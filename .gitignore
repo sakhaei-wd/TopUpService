@@ -1,0 +1,30 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+*.swp
+
+## SQLite databases
+*.db
+*.db-shm
+*.db-wal
+
+## Build output
+publish/
+artifacts/
+
+## Secrets
+appsettings.*.json
+!appsettings.Development.json
+secrets.json
+
+## OS
+.DS_Store
+Thumbs.db
+
+## Rider / VS Code
+.idea/
+.vscode/
+*.DotSettings.user
