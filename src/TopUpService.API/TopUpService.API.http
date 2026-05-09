@@ -1,0 +1,6 @@
+@TopUpService.API_HostAddress = http://localhost:5239
+
+GET {{TopUpService.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
