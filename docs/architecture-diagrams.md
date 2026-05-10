@@ -19,16 +19,16 @@ graph TB
     end
 
     subgraph TopUpSvc["TopUp Service — New Microservice"]
-        CONSUMER[RabbitMQ Consumer\nBackgroundService]
-        HANDLER[ProcessTopUpCommand\nHandler]
-        IDEMPOTENCY[Idempotency Store\nInMemory / Redis]
-        DB[(SQLite / SQL Server\nTopUpTransactions)]
-        PUBLISHER[RabbitMQ Result\nPublisher]
-        MCIHTTP[MCI HTTP Client\nMock / Real]
+        CONSUMER[RabbitMQ Consumer<br/>BackgroundService]
+        HANDLER[ProcessTopUpCommand<br/>Handler]
+        IDEMPOTENCY[Idempotency Store<br/>InMemory / Redis]
+        DB[(SQLite / SQL Server<br/>TopUpTransactions)]
+        PUBLISHER[RabbitMQ Result<br/>Publisher]
+        MCIHTTP[MCI HTTP Client<br/>Mock / Real]
     end
 
     subgraph External["External Operator"]
-        MCI[MCI API\nشارژ فوری]
+        MCI[MCI API<br/>شارژ فوری]
     end
 
     TERM -->|TCP Purchase| SWITCH
@@ -51,14 +51,14 @@ graph TB
 
 ```mermaid
 graph TD
-    subgraph API["API Layer\nTopUpService.API"]
-        PROG[Program.cs\nComposition Root]
-        CTRL[TopUpController\nQuery Endpoints]
-        MW[GlobalException\nMiddleware]
+    subgraph API["API Layer<br/>TopUpService.API"]
+        PROG[Program.cs<br/>Composition Root]
+        CTRL[TopUpController<br/>Query Endpoints]
+        MW[GlobalException<br/>Middleware]
     end
 
-    subgraph APP["Application Layer\nTopUpService.Application"]
-        HDL[ProcessTopUpCommand\nHandler]
+    subgraph APP["Application Layer<br/>TopUpService.Application"]
+        HDL[ProcessTopUpCommand<br/>Handler]
         CMD[ProcessTopUpCommand]
         EVT[TopUpResultEvent]
         IREPO[ITopUpRepository]
@@ -67,19 +67,19 @@ graph TD
         IIDEM[IIdempotencyStore]
     end
 
-    subgraph DOM["Domain Layer\nTopUpService.Domain"]
-        ENT[TopUpTransaction\nAggregate Root]
-        ENUM[TopUpStatus\nEnum]
-        EXC[TopUpDomain\nException]
+    subgraph DOM["Domain Layer<br/>TopUpService.Domain"]
+        ENT[TopUpTransaction<br/>Aggregate Root]
+        ENUM[TopUpStatus<br/>Enum]
+        EXC[TopUpDomain<br/>Exception]
     end
 
-    subgraph INFRA["Infrastructure Layer\nTopUpService.Infrastructure"]
-        REPO[TopUpRepository\nEF Core]
-        CTX[TopUpDbContext\nSQLite]
+    subgraph INFRA["Infrastructure Layer<br/>TopUpService.Infrastructure"]
+        REPO[TopUpRepository<br/>EF Core]
+        CTX[TopUpDbContext<br/>SQLite]
         MOCK[MockMciTopUpClient]
-        CONS[TopUpRequestConsumer\nBackgroundService]
-        PUB[RabbitMqTopUpResult\nPublisher]
-        IDEM[InMemoryIdempotency\nStore]
+        CONS[TopUpRequestConsumer<br/>BackgroundService]
+        PUB[RabbitMqTopUpResult<br/>Publisher]
+        IDEM[InMemoryIdempotency<br/>Store]
     end
 
     API --> APP
@@ -106,25 +106,25 @@ graph TD
 stateDiagram-v2
     [*] --> Pending : TopUpTransaction.Create()
 
-    Pending --> Processing : MarkProcessing()\nattemptCount++
+    Pending --> Processing : MarkProcessing()<br/>attemptCount++
 
-    Processing --> Processing : RecordRetryAttempt()\n(transient error, attempt < 3)
+    Processing --> Processing : RecordRetryAttempt()<br/>(transient error, attempt < 3)
 
-    Processing --> Succeeded : MarkSucceeded(mciRef)\nMCI returned OK
+    Processing --> Succeeded : MarkSucceeded(mciRef)<br/>MCI returned OK
 
-    Processing --> Failed : MarkFailed(reason)\nMCI business error\n(no retry)
+    Processing --> Failed : MarkFailed(reason)<br/>MCI business error<br/>(no retry)
 
-    Processing --> ReversalRequired : MarkReversalRequired(reason)\nAll 3 retries exhausted
+    Processing --> ReversalRequired : MarkReversalRequired(reason)<br/>All 3 retries exhausted
 
-    Succeeded --> [*] : Result published\nIsSuccess=true\nRequiresReversal=false
+    Succeeded --> [*] : Result published<br/>IsSuccess=true<br/>RequiresReversal=false
 
-    Failed --> [*] : Result published\nIsSuccess=false\nRequiresReversal=false
+    Failed --> [*] : Result published<br/>IsSuccess=false<br/>RequiresReversal=false
 
-    ReversalRequired --> [*] : Result published\nIsSuccess=false\nRequiresReversal=true\nSwitch issues Shaparak Reversal
+    ReversalRequired --> [*] : Result published<br/>IsSuccess=false<br/>RequiresReversal=true<br/>Switch issues Shaparak Reversal
 
-    note right of Succeeded : MCI confirmed charge\nFunds stay debited
-    note right of Failed : MCI rejected (business error)\nSwitch returns funds
-    note right of ReversalRequired : MCI unreachable\nSwitch must reverse\nShaparak transaction
+    note right of Succeeded : MCI confirmed charge<br/>Funds stay debited
+    note right of Failed : MCI rejected (business error)<br/>Switch returns funds
+    note right of ReversalRequired : MCI unreachable<br/>Switch must reverse<br/>Shaparak transaction
 ```
 
 ---
@@ -135,23 +135,23 @@ stateDiagram-v2
 graph TB
     subgraph Docker["Docker Compose / Kubernetes"]
         subgraph SVC["topup-service container"]
-            API2[ASP.NET Core\nKestrel :8080]
-            BGS[BackgroundService\nRabbitMQ Consumer]
+            API2[ASP.NET Core<br/>Kestrel :8080]
+            BGS[BackgroundService<br/>RabbitMQ Consumer]
         end
 
         subgraph RMQ2["rabbitmq container"]
-            MGMT[Management UI\n:15672]
-            AMQP[AMQP\n:5672]
+            MGMT[Management UI<br/>:15672]
+            AMQP[AMQP<br/>:5672]
         end
 
         subgraph DATA["Volume: topup-data"]
-            SQLITE[(topup.db\nSQLite)]
+            SQLITE[(topup.db<br/>SQLite)]
         end
     end
 
     subgraph OPS["Operations"]
-        SW[Swagger UI\nlocalhost:8080/swagger]
-        RMQUI[RabbitMQ UI\nlocalhost:15672]
+        SW[Swagger UI<br/>localhost:8080/swagger]
+        RMQUI[RabbitMQ UI<br/>localhost:15672]
     end
 
     BGS <-->|AMQP| AMQP
