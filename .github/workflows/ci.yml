@@ -27,15 +27,17 @@ jobs:
         run: dotnet build --no-restore -c Release
 
       - name: Run unit tests
-        run: dotnet test tests/TopUpService.UnitTests/TopUpService.UnitTests.csproj \
-             --no-build -c Release \
-             --logger "trx;LogFileName=test-results.trx" \
-             --results-directory ./TestResults
+        run: |
+          dotnet test tests/TopUpService.UnitTests/TopUpService.UnitTests.csproj \
+            --no-build \
+            -c Release \
+            --logger "trx;LogFileName=test-results.trx" \
+            --results-directory ./TestResults
 
       - name: Publish test results
         uses: dorny/test-reporter@v1
         if: always()
         with:
           name: Unit Tests
-          path: TestResults/test-results.trx
+          path: "**/TestResults/*.trx"
           reporter: dotnet-trx
